@@ -41,7 +41,7 @@ router.delete("/:id", async (req, res) => {
     }
 });
 
-//GET PRODUCT
+//GET PRODUCT BY ID
 router.get("/find/:id", async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
@@ -51,7 +51,7 @@ router.get("/find/:id", async (req, res) => {
     }
 });
 
-//GET PRODUCT
+//GET FEATURED PRODUCT
 router.get("/featured", async (req, res) => {
     try {
         const product = await Product.find({ featured: true });
@@ -61,125 +61,60 @@ router.get("/featured", async (req, res) => {
     }
 });
 
-//// GET products with filters and sorters
-//router.get('/products', async (req, res) => {
-//    try {
-//      const { category, priceMin, priceMax, sortBy, sortOrder } = req.query;
-//      const filters = {};
-//      const sort = {};
-  
-//      // Set filters based on query parameters
-//      if (category) {
-//        filters.category = category;
-//      }
-//      if (priceMin) {
-//        filters.price = { $gte: priceMin };
-//      }
-//      if (priceMax) {
-//        filters.price = { ...filters.price, $lte: priceMax };
-//      }
-  
-//      // Set sort based on query parameters
-//      if (sortBy) {
-//        sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
-//      }
-  
-//      // Query the database with filters and sorters
-//      const products = await Product.find(filters).sort(sort);
-  
-//      res.json(products);
-//    } catch (error) {
-//      console.error(error);
-//      res.status(500).send('Server Error');
-//    }
-//  });
-
-router.get('/', async (req, res) => {
-    try {
-      const { category, priceMin, priceMax, sortBy, sortOrder, page = 1, limit = 10 } = req.query;
-      const filters = {};
-      const sort = {};
-  
-      // Set filters based on query parameters
-      if (category) {
-        filters.category = category;
-      }
-      if (priceMin) {
-        filters.price = { $gte: priceMin };
-      }
-      if (priceMax) {
-        filters.price = { ...filters.price, $lte: priceMax };
-      }
-      console.log(filters);
-      // Set sort based on query parameters
-      if (sortBy) {
-        sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
-      }
-  
-      // Calculate skip and limit based on page and limit
-      const skip = (page - 1) * limit;
-  
-      // Query the database with filters, sorters and pagination
-      const products = await Product.find(filters)
-        .sort(sort)
-        .skip(skip)
-        .limit(parseInt(limit));
-  
-      const count = await Product.countDocuments(filters);
-  
-      res.json({
-        products,
-        currentPage: parseInt(page),
-        totalPages: Math.ceil(count / limit),
-        totalProducts: count,
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Server Error');
-    }
-  });
-  
-
 //GET ALL PRODUCTS
-//router.get("/", async (req, res) => {
-//    const pageOptions = {
-//        page: parseInt(req.query.page, 10) || 1,
-//        limit: parseInt(req.query.limit, 10) || 10,
-//        priceRange: req.query.priceRange || null,
-//        category: req.query.categories || null,
-//    };
-//    console.log('pageOptions', pageOptions);
+router.get("/", async (req, res) => {
+    try {
+        const {
+            category,
+            priceMin,
+            priceMax,
+            sortBy,
+            sortOrder,
+            page = 1,
+            limit = 10,
+        } = req.query;
+        //  const filters = {};
+        const filters = {};
 
-//    try {
-//        let products;
+        const sort = {};
 
-//        console.log("usao gore", pageOptions.priceRange);
-//        if (pageOptions.priceRange) {
-//            console.log("usao ovde", pageOptions.priceRange);
-//            products = await Product.find({
-//                price: { $gt: 20, $lt: 100 },
-//            })
-//                .skip(
-//                    pageOptions.page === 1
-//                        ? 0
-//                        : pageOptions.page * pageOptions.limit -
-//                              pageOptions.limit
-//                )
-//                .limit(pageOptions.limit);
-//        } else {
-//            products = await Product.find()
-//                .skip(
-//                    pageOptions.page === 1
-//                        ? 0
-//                        : pageOptions.page * pageOptions.limit -
-//                              pageOptions.limit
-//                )
-//                .limit(pageOptions.limit);
-//        }
-//        res.status(200).json(products);
-//    } catch (err) {
-//        res.status(500).json(err);
-//    }
-//});
+        // Set filters based on query parameters
+        if (category) {
+            filters.category = category;
+        }
+        if (priceMin) {
+            filters.price = { $gte: priceMin };
+        }
+        if (priceMax) {
+            filters.price = { ...filters.price, $lte: priceMax };
+        }
+
+        // Set sort based on query parameters
+        if (sortBy) {
+            sort[sortBy] = sortOrder === "asc" ? 1 : -1;
+        }
+
+        // Calculate skip and limit based on page and limit
+        const skip = (page - 1) * limit;
+
+        // Query the database with filters, sorters and pagination
+        const products = await Product.find(filters)
+            .sort(sort)
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        const count = await Product.countDocuments(filters);
+
+        res.json({
+            products,
+            currentPage: parseInt(page),
+            totalPages: Math.ceil(count / limit),
+            totalProducts: count,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Server Error");
+    }
+});
 
 module.exports = router;

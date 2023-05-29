@@ -11,3 +11,7 @@ Live demo of my app - [e-commerce-shop-app-live](https://e-commerce-shop-app.ver
 -   Node.js
 -   Express.js
 -   Mongo DB with mongoose
+
+#### Photos
+
+-   Link for photos - [picsum-photos](https://picsum.photos/images)
